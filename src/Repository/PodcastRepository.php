@@ -39,28 +39,31 @@ class PodcastRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Podcast[] Returns an array of Podcast objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Podcast
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function getOneWithEpisodes(int $podcastId): Podcast
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.id = :podcastId')
+            ->andWhere('p.disabledAt is NULL')
+            ->setParameter('podcastId', $podcastId)
+            ->leftJoin('p.episodes', 'e')
+            ->getQuery()
+            ->getSingleResult();
+    }
+    public function getOne(int $podcastId): Podcast
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.id = :podcastId')
+            ->andWhere('p.disabledAt is NULL')
+            ->setParameter('podcastId', $podcastId)
+            ->getQuery()
+            ->getSingleResult();
+    }
+    public function getAll(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.disabledAt is NULL')
+            ->leftJoin('p.episodes', 'e')
+            ->getQuery()
+            ->getResult();
+    }
 }

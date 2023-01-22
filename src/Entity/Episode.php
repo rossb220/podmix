@@ -13,7 +13,7 @@ class Episode
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 300)]
+    #[ORM\Column(length: 1000)]
     private ?string $url = null;
 
     #[ORM\Column(length: 50)]
@@ -25,11 +25,18 @@ class Episode
     #[ORM\Column(length: 100)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 200, nullable: true)]
+    #[ORM\Column(length: 5000, nullable: true)]
     private ?string $description = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $author = null;
+
+    #[ORM\ManyToOne(inversedBy: 'episodes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Podcast $podcast = null;
+
+    #[ORM\Column(length: 500)]
+    private ?string $guid = null;
 
     public function getId(): ?int
     {
@@ -104,6 +111,30 @@ class Episode
     public function setAuthor(?string $author): self
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getPodcast(): ?Podcast
+    {
+        return $this->podcast;
+    }
+
+    public function setPodcast(?Podcast $podcast): self
+    {
+        $this->podcast = $podcast;
+
+        return $this;
+    }
+
+    public function getGuid(): ?string
+    {
+        return $this->guid;
+    }
+
+    public function setGuid(string $guid): self
+    {
+        $this->guid = $guid;
 
         return $this;
     }
