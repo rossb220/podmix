@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\PodcastRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PodcastRepository::class)]
 class Podcast
@@ -11,20 +14,37 @@ class Podcast
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['GET'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(nullable: true)]
+    #[Groups(['GET'])]
     private ?string $title = null;
 
-    #[ORM\Column(length: 200)]
+    #[ORM\Column(length: 1000, unique: true)]
+    #[Groups(['GET'])]
     private ?string $url = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['GET'])]
     private ?\DateTimeImmutable $disabledAt = null;
+
+    #[ORM\OneToMany(mappedBy: 'podcast', targetEntity: Episode::class)]
+    private Collection $episodes;
+
+    public function __construct()
+    {
+        $this->episodes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getTitle(): ?string
@@ -59,6 +79,36 @@ class Podcast
     public function setDisabledAt(\DateTimeImmutable $disabledAt): self
     {
         $this->disabledAt = $disabledAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Episode>
+     */
+    public function getEpisodes(): Collection
+    {
+        return $this->episodes;
+    }
+
+    public function addEpisode(Episode $episode): self
+    {
+        if (!$this->episodes->contains($episode)) {
+            $this->episodes->add($episode);
+            $episode->setPodcast($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEpisode(Episode $episode): self
+    {
+        if ($this->episodes->removeElement($episode)) {
+            // set the owning side to null (unless already changed)
+            if ($episode->getPodcast() === $this) {
+                $episode->setPodcast(null);
+            }
+        }
 
         return $this;
     }
