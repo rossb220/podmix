@@ -6,16 +6,18 @@ use App\Repository\PodcastRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PodcastRepository::class)]
 class Podcast
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[Groups(['GET'])]
-    private ?int $id = null;
+    private ?string $id = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['GET'])]
@@ -30,6 +32,7 @@ class Podcast
     private ?\DateTimeImmutable $disabledAt = null;
 
     #[ORM\OneToMany(mappedBy: 'podcast', targetEntity: Episode::class)]
+    #[Groups(['GET'])]
     private Collection $episodes;
 
     public function __construct()
@@ -37,14 +40,14 @@ class Podcast
         $this->episodes = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(): ?string
     {
-        $this->id = $id;
+        return $this->id;
     }
 
     public function getTitle(): ?string

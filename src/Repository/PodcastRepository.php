@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Podcast;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 /**
  * @extends ServiceEntityRepository<Podcast>
@@ -39,22 +40,23 @@ class PodcastRepository extends ServiceEntityRepository
         }
     }
 
-    public function getOneWithEpisodes(int $podcastId): Podcast
+    public function getOneWithEpisodes(string $podcastId): Podcast
     {
         return $this->createQueryBuilder('p')
             ->where('p.id = :podcastId')
             ->andWhere('p.disabledAt is NULL')
-            ->setParameter('podcastId', $podcastId)
+            ->setParameter('podcastId', $podcastId, UuidType::NAME)
             ->leftJoin('p.episodes', 'e')
             ->getQuery()
             ->getSingleResult();
     }
-    public function getOne(int $podcastId): Podcast
+    public function getOne(string $podcastId): Podcast
     {
         return $this->createQueryBuilder('p')
             ->where('p.id = :podcastId')
             ->andWhere('p.disabledAt is NULL')
-            ->setParameter('podcastId', $podcastId)
+            ->leftJoin('p.episodes', 'e')
+            ->setParameter('podcastId', $podcastId, UuidType::NAME)
             ->getQuery()
             ->getSingleResult();
     }
