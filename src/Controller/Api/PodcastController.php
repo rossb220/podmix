@@ -55,7 +55,7 @@ class PodcastController extends AbstractController
     }
 
     #[Route('/podcast/{id}', name: 'api_podcast_get', methods: ["GET"])]
-    public function get(int $id): Response
+    public function get(string $id): Response
     {
         $podcast = $this->repository->getOne($id);
 
@@ -70,7 +70,7 @@ class PodcastController extends AbstractController
         return $this->response($podcasts);
     }
     #[Route('/podcast/{id}/refresh', name: 'api_podcast_refresh', methods: ["POST"])]
-    public function refresh(int $id): Response
+    public function refresh(string $id): Response
     {
         $podcast = $this->repository->getOne($id);
 
@@ -87,7 +87,7 @@ class PodcastController extends AbstractController
         return new JsonResponse(['message' => 'acknowledged']);
     }
     #[Route('/podcast/{id}', name: 'api_podcast_delete', methods: ["DELETE"])]
-    public function delete(int $id): Response
+    public function delete(string $id): Response
     {
         $podcast = $this->repository->findOneBy(['id' => $id]);
 
@@ -98,7 +98,6 @@ class PodcastController extends AbstractController
         $podcast->setDisabledAt(new DateTimeImmutable());
 
         $this->repository->save($podcast, true);
-        $this->bus->dispatch(new PodcastUpdateMessage($podcast->getId()));
 
         return $this->response($podcast);
     }

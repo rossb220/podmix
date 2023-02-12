@@ -4,14 +4,16 @@ namespace App\Entity;
 
 use App\Repository\PlaylistEpisodeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 #[ORM\Entity(repositoryClass: PlaylistEpisodeRepository::class)]
 class PlaylistEpisode
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?string $id = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
@@ -24,7 +26,12 @@ class PlaylistEpisode
     #[ORM\Column]
     private ?\DateTimeImmutable $publishedAt = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    public function setId(): ?string
     {
         return $this->id;
     }

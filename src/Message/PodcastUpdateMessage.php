@@ -4,14 +4,14 @@ namespace App\Message;
 
 final class PodcastUpdateMessage
 {
-    private int $podcastId;
+    private string $podcastId;
 
-    public function __construct(int $podcastId)
+    public function __construct(string $podcastId)
     {
         $this->podcastId = $podcastId;
     }
 
-    public function getPodcastId(): int
+    public function getPodcastId(): string
     {
         return $this->podcastId;
     }

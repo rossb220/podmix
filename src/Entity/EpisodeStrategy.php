@@ -5,30 +5,41 @@ namespace App\Entity;
 use App\Repository\EpisodeStrategyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 #[ORM\Entity(repositoryClass: EpisodeStrategyRepository::class)]
 class EpisodeStrategy
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['GET'])]
+    private ?string $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['GET'])]
     private ?string $title = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['GET'])]
     private ?int $length = null;
 
-    #[ORM\Column]
-    private ?bool $isRandom = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $ExpressionScript = null;
+    #[Groups(['GET'])]
+    private ?string $expression = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
+    }
+
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -55,26 +66,14 @@ class EpisodeStrategy
         return $this;
     }
 
-    public function isIsRandom(): ?bool
-    {
-        return $this->isRandom;
-    }
-
-    public function setIsRandom(bool $isRandom): self
-    {
-        $this->isRandom = $isRandom;
-
-        return $this;
-    }
-
-    public function getExpressionScript(): ?string
+    public function getExpression(): ?string
     {
         return $this->ExpressionScript;
     }
 
-    public function setExpressionScript(?string $ExpressionScript): self
+    public function setExpression(?string $expression): self
     {
-        $this->ExpressionScript = $ExpressionScript;
+        $this->expression = $expression;
 
         return $this;
     }

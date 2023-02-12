@@ -3,32 +3,42 @@
 namespace App\Entity;
 
 use App\Repository\EpisodeRepository;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EpisodeRepository::class)]
 class Episode
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['GET'])]
+    private ?string $id = null;
 
     #[ORM\Column(length: 1000)]
+    #[Groups(['GET'])]
     private ?string $url = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['GET'])]
     private ?string $type = null;
 
     #[ORM\Column]
+    #[Groups(['GET'])]
     private ?int $length = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 1000)]
+    #[Groups(['GET'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 5000, nullable: true)]
+    #[Groups(['GET'])]
     private ?string $description = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['GET'])]
     private ?string $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'episodes')]
@@ -36,9 +46,15 @@ class Episode
     private ?Podcast $podcast = null;
 
     #[ORM\Column(length: 500)]
+    #[Groups(['GET'])]
     private ?string $guid = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    public function setId(): ?string
     {
         return $this->id;
     }

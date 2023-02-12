@@ -2,24 +2,33 @@
 
 namespace App\Entity;
 
-use App\Repository\PlaylistRepository;
+use App\Repository\EpisodeStrategyRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
-#[ORM\Entity(repositoryClass: PlaylistRepository::class)]
+#[ORM\Entity(repositoryClass: EpisodeStrategyRepository::class)]
 class Playlist
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['GET'])]
+    private ?string $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['GET'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 150, nullable: true)]
+    #[Groups(['GET'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['GET'])]
     private ?string $link = null;
 
     #[ORM\Column]
@@ -34,7 +43,21 @@ class Playlist
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $disabledAt = null;
 
-    public function getId(): ?int
+    #[ORM\OneToMany(mappedBy: 'playlist', targetEntity: PlaylistConfig::class, cascade: ['persist', 'remove'])]
+    #[Groups(['GET'])]
+    private Collection $playlistConfigs;
+
+    public function __construct()
+    {
+        $this->playlistConfigs = new ArrayCollection();
+    }
+
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    public function setId(): ?string
     {
         return $this->id;
     }
@@ -124,6 +147,36 @@ class Playlist
     public function setDisabledAt(?\DateTimeImmutable $disabledAt): self
     {
         $this->disabledAt = $disabledAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PlaylistConfig>
+     */
+    public function getPlaylistConfigs(): Collection
+    {
+        return $this->playlistConfigs;
+    }
+
+    public function addPlaylistConfig(PlaylistConfig $playlistConfig): self
+    {
+        if (!$this->playlistConfigs->contains($playlistConfig)) {
+            $this->playlistConfigs->add($playlistConfig);
+            $playlistConfig->setPlaylist($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlaylistConfig(PlaylistConfig $playlistConfig): self
+    {
+        if ($this->playlistConfigs->removeElement($playlistConfig)) {
+            // set the owning side to null (unless already changed)
+            if ($playlistConfig->getPlaylist() === $this) {
+                $playlistConfig->setPlaylist(null);
+            }
+        }
 
         return $this;
     }
