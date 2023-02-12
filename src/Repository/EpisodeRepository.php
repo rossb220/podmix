@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Episode;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<Episode>
@@ -37,5 +38,29 @@ class EpisodeRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getAllByPodcastIds(array $podcastIds): array
+    {
+        $convertedToDbValue = array_map(function (string $id) {
+            return Uuid::fromString($id)->toBinary();
+        }, $podcastIds);
+
+        return $this->createQueryBuilder('e')
+            ->where('p.id in (:podcastIds)')
+            ->andWhere('p.disabledAt is NULL')
+            ->join('e.podcast', 'p')
+            ->setParameter('podcastIds', $convertedToDbValue)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getAll(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('p.disabledAt is NULL')
+            ->join('e.podcast', 'p')
+            ->getQuery()
+            ->getResult();
     }
 }

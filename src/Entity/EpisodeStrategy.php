@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EpisodeStrategyRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -15,20 +17,29 @@ class EpisodeStrategy
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    #[Groups(['GET'])]
+    #[Groups(['EpisodeStrategy'])]
     private ?string $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['GET'])]
+    #[Groups(['EpisodeStrategy'])]
     private ?string $title = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['GET'])]
+    #[Groups(['EpisodeStrategy'])]
     private ?int $length = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['GET'])]
-    private ?string $expression = null;
+    #[ORM\Column(nullable: true)]
+    #[Groups(['EpisodeStrategy'])]
+    private ?array $expression = null;
+
+    #[ORM\ManyToMany(targetEntity: Podcast::class)]
+    #[Groups(['EpisodeStrategy'])]
+    private Collection $podcasts;
+
+    public function __construct()
+    {
+        $this->podcasts = new ArrayCollection();
+    }
 
     public function getId(): ?string
     {
@@ -66,14 +77,45 @@ class EpisodeStrategy
         return $this;
     }
 
-    public function getExpression(): ?string
+    public function getExpression(): ?array
     {
-        return $this->ExpressionScript;
+        return $this->expression;
     }
 
-    public function setExpression(?string $expression): self
+    public function setExpression(?array $expression): self
     {
         $this->expression = $expression;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Podcast>
+     */
+    public function getPodcasts(): Collection
+    {
+        return $this->podcasts;
+    }
+
+    public function addPodcast(Podcast $podcast): self
+    {
+        if (!$this->podcasts->contains($podcast)) {
+            $this->podcasts->add($podcast);
+        }
+
+        return $this;
+    }
+
+    public function setPodcasts(Collection $podcasts): self
+    {
+        $this->podcasts = $podcasts;
+
+        return $this;
+    }
+
+    public function removePodcast(Podcast $podcast): self
+    {
+        $this->podcasts->removeElement($podcast);
 
         return $this;
     }

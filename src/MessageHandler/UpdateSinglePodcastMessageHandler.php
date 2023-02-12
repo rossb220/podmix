@@ -2,14 +2,15 @@
 
 namespace App\MessageHandler;
 
-use App\Message\PodcastUpdateMessage;
+use App\Message\UpdateSinglePodcastMessage;
 use App\Repository\PodcastRepository;
 use App\Service\EpisoderUpdater;
+use App\Service\RssReader;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Exception;
 
-final class PodcastUpdateMessageHandler implements MessageHandlerInterface
+final class UpdateSinglePodcastMessageHandler implements MessageHandlerInterface
 {
     public function __construct(
         readonly PodcastRepository $podcastRepository,
@@ -17,7 +18,7 @@ final class PodcastUpdateMessageHandler implements MessageHandlerInterface
         readonly LoggerInterface $logger
     ) {
     }
-    public function __invoke(PodcastUpdateMessage $message): void
+    public function __invoke(UpdateSinglePodcastMessage $message): void
     {
         $podcastId = $message->getPodcastId();
 
@@ -30,6 +31,8 @@ final class PodcastUpdateMessageHandler implements MessageHandlerInterface
             return;
         }
 
-        $this->updater->updateEpisodes($podcast);
+        $rssReader = new RssReader($podcast->getUrl());
+        $this->updater->updateEpisodes($podcast, $rssReader);
+        $this->updater->updatePodcast($podcast, $rssReader);
     }
 }

@@ -15,16 +15,16 @@ class PlaylistEpisode
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?string $id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\Column]
+    private ?\DateTimeImmutable $publishedAt = null;
+
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Episode $episode = null;
 
-    #[ORM\OneToOne(inversedBy: 'playlistEpisode', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'playlistEpisodes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Playlist $Playlist = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $publishedAt = null;
+    private ?Playlist $playlist = null;
 
     public function getId(): ?string
     {
@@ -36,30 +36,6 @@ class PlaylistEpisode
         return $this->id;
     }
 
-    public function getEpisode(): ?Episode
-    {
-        return $this->episode;
-    }
-
-    public function setEpisode(Episode $episode): self
-    {
-        $this->episode = $episode;
-
-        return $this;
-    }
-
-    public function getPlaylist(): ?Playlist
-    {
-        return $this->Playlist;
-    }
-
-    public function setPlaylist(Playlist $Playlist): self
-    {
-        $this->Playlist = $Playlist;
-
-        return $this;
-    }
-
     public function getPublishedAt(): ?\DateTimeImmutable
     {
         return $this->publishedAt;
@@ -68,6 +44,30 @@ class PlaylistEpisode
     public function setPublishedAt(\DateTimeImmutable $publishedAt): self
     {
         $this->publishedAt = $publishedAt;
+
+        return $this;
+    }
+
+    public function getEpisode(): ?Episode
+    {
+        return $this->episode;
+    }
+
+    public function setEpisode(?Episode $episode): self
+    {
+        $this->episode = $episode;
+
+        return $this;
+    }
+
+    public function getPlaylist(): ?Playlist
+    {
+        return $this->playlist;
+    }
+
+    public function setPlaylist(?Playlist $playlist): self
+    {
+        $this->playlist = $playlist;
 
         return $this;
     }

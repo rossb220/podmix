@@ -8,6 +8,10 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PlaylistConfigRepository::class)]
+#[ORM\UniqueConstraint(
+    name: 'playlist_position_unique_idx',
+    columns: ['playlist_id', 'position']
+)]
 class PlaylistConfig
 {
     #[ORM\Id]
@@ -25,7 +29,7 @@ class PlaylistConfig
     #[Groups(['GET'])]
     private ?EpisodeStrategy $episodeStrategy = null;
 
-    #[ORM\Column(unique: true)]
+    #[ORM\Column()]
     #[Groups(['GET'])]
     private ?int $position = null;
 

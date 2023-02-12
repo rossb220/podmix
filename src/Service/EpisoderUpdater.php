@@ -18,12 +18,11 @@ class EpisoderUpdater
     ) {
     }
 
-    public function updateEpisodes(Podcast $podcast)
+    public function updateEpisodes(Podcast $podcast, RssReader $rssReader)
     {
-        $rssEpisodeGetter = new RssReader($podcast->getUrl());
         $dbEpisodeMap = $this->getEpisodesMap($podcast->getEpisodes());
 
-        $rssEpisodes = $rssEpisodeGetter->getEpisodes();
+        $rssEpisodes = $rssReader->getEpisodes();
 
         foreach ($rssEpisodes as $rssEpisode) {
             $episode = $dbEpisodeMap[$rssEpisode->getGuid()] ?? $rssEpisode;
@@ -31,6 +30,7 @@ class EpisoderUpdater
             $this->episodeRepository->save($episode, true);
         }
     }
+
 
     /**
      * @param $episodes Collection<int, Episode>
@@ -46,5 +46,16 @@ class EpisoderUpdater
         }
 
         return $map;
+    }
+
+    public function updatePodcast(Podcast $podcast, RssReader $rssReader)
+    {
+        $rssPodcast = $rssReader->getPodcast();
+
+        $podcast->setPubDate($rssPodcast->getPubDate())
+            ->setDescription($rssPodcast->getDescription())
+            ->setTitle($rssPodcast->getTitle());
+
+        $this->podcastRepository->save($podcast, true);
     }
 }

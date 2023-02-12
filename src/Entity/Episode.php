@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\EpisodeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -33,7 +36,7 @@ class Episode
     #[Groups(['GET'])]
     private ?string $title = null;
 
-    #[ORM\Column(length: 5000, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['GET'])]
     private ?string $description = null;
 
@@ -48,6 +51,10 @@ class Episode
     #[ORM\Column(length: 500)]
     #[Groups(['GET'])]
     private ?string $guid = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['GET'])]
+    private ?\DateTimeImmutable $pubDate = null;
 
     public function getId(): ?string
     {
@@ -151,6 +158,18 @@ class Episode
     public function setGuid(string $guid): self
     {
         $this->guid = $guid;
+
+        return $this;
+    }
+
+    public function getPubDate(): ?\DateTimeImmutable
+    {
+        return $this->pubDate;
+    }
+
+    public function setPubDate(?\DateTimeImmutable $pubDate): self
+    {
+        $this->pubDate = $pubDate;
 
         return $this;
     }
