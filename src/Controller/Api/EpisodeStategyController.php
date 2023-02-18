@@ -36,7 +36,7 @@ class EpisodeStategyController extends AbstractController
             throw new BadRequestException('no body');
         }
 
-        /* @var  EpisodeStrategy */
+        /* @var EpisodeStrategy $episodeStrategy */
         $episodeStrategy = $this->serializer->deserialize($requestBody, EpisodeStrategy::class, 'json');
 
         $duplicateEpisodeStrategy = $this->repository->findOneBy(['title' => $episodeStrategy->getTitle()]);
