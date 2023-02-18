@@ -3,6 +3,7 @@
 namespace App\Tests\Controller\Api;
 
 use App\Entity\Podcast;
+use Faker\Factory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,11 +12,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class PodcastControllerTest extends WebTestCase
 {
+
     public function testCreatePodcast(): Podcast
     {
         $client = static::createClient();
         $originalPodcast = new Podcast();
-        $originalPodcast->setUrl("https://feeds.npr.org/500005/podcast.xml");
+        $faker = Factory::create();
+        $originalPodcast->setCustomTitle($faker->name());
+        $originalPodcast->setUrl($faker->url());
 
         /** @var SerializerInterface $serializer */
         $serializer = $client->getContainer()->get(SerializerInterface::class);
@@ -119,7 +123,7 @@ class PodcastControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request(Request::METHOD_DELETE, sprintf("/api/podcast/%d", $podcast->getId()));
+        $client->request(Request::METHOD_DELETE, sprintf("/api/podcast/%s", $podcast->getId()));
 
         $this->assertResponseIsSuccessful();
 

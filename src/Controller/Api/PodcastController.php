@@ -89,7 +89,7 @@ class PodcastController extends AbstractController
     #[Route('/podcast/{id}', name: 'api_podcast_delete', methods: ["DELETE"])]
     public function delete(string $id): Response
     {
-        $podcast = $this->repository->findOneBy(['id' => $id]);
+        $podcast = $this->repository->getOne($id);
 
         if ($podcast === null) {
             throw new NotFoundHttpException('podcast not found');
