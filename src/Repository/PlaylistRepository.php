@@ -45,8 +45,11 @@ class PlaylistRepository extends ServiceEntityRepository
     public function findOneById(string $id): Playlist
     {
         return $this->createQueryBuilder('p')
+            ->select(['p', 'pc', 'es'])
             ->where('p.id = :id')
             ->setParameter('id', $id, UuidType::NAME)
+            ->leftJoin('p.playlistConfigs', 'pc')
+            ->leftJoin('pc.episodeStrategy', 'es')
             ->getQuery()
             ->getSingleResult();
     }

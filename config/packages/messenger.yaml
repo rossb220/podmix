@@ -16,8 +16,10 @@ framework:
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
-            App\Message\PodcastUpdateMessage: async
-            App\Message\PodcastsUpdateMessage: async
+            App\Message\UpdateSinglePodcastMessage: async
+            App\Message\UpdateAllPodcastsMessage: async
+            App\Message\UpdateSinglePlaylistMessage: async
+            App\Message\UpdateAllPlaylistsMessage: async
 
             # Route your messages to the transports
             # 'App\Message\YourMessage': async

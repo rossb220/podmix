@@ -6,6 +6,7 @@ use App\Entity\Podcast;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<Podcast>
@@ -56,6 +57,7 @@ class PodcastRepository extends ServiceEntityRepository
             ->where('p.id = :podcastId')
             ->andWhere('p.disabledAt is NULL')
             ->leftJoin('p.episodes', 'e')
+            ->orderBy('e.pubDate', 'DESC')
             ->setParameter('podcastId', $podcastId, UuidType::NAME)
             ->getQuery()
             ->getSingleResult();
@@ -65,6 +67,21 @@ class PodcastRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->where('p.disabledAt is NULL')
             ->leftJoin('p.episodes', 'e')
+            ->orderBy('e.pubDate', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getByIds(array $podcastIds): array
+    {
+        $convertedToDbValue = array_map(function (string $id) {
+            return Uuid::fromString($id)->toBinary();
+        }, $podcastIds);
+
+        return $this->createQueryBuilder('p')
+            ->where('p.id in (:podcastIds)')
+            ->andWhere('p.disabledAt is NULL')
+            ->setParameter('podcastIds', $convertedToDbValue)
             ->getQuery()
             ->getResult();
     }

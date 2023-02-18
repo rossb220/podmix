@@ -3,6 +3,10 @@
 namespace App\Controller\Api;
 
 use App\Entity\Playlist;
+use App\Message\PlaylistUpdateMessage;
+use App\Message\UpdateSinglePodcastMessage;
+use App\Message\UpdateSinglePlaylistMessage;
+use App\MessageHandler\UpdateSinglePlaylistMessageHandler;
 use App\Repository\EpisodeStrategyRepository;
 use App\Repository\PlaylistConfigRepository;
 use App\Repository\PlaylistRepository;
@@ -14,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -25,7 +30,9 @@ class PlaylistController extends AbstractController
         readonly SerializerInterface $serializer,
         readonly PlaylistRepository $repository,
         readonly PlaylistConfigRepository $playlistConfigRepository,
-        readonly EpisodeStrategyRepository $episodeStrategyRepository
+        readonly EpisodeStrategyRepository $episodeStrategyRepository,
+        readonly MessageBusInterface $bus,
+        readonly UpdateSinglePlaylistMessageHandler $handler
     ) {
     }
     #[Route('/playlist', name: 'api_playlist_create', methods: ['POST'])]
@@ -47,21 +54,40 @@ class PlaylistController extends AbstractController
 
         $playlist->setPublishedAt(new DateTimeImmutable());
 
-        foreach ($playlist->getPlaylistConfigs() as $config) {
+        foreach ($playlist->getPlaylistConfigs() as $key => $config) {
             $episodeStrategy = $this->episodeStrategyRepository->findOneById($config->getEpisodeStrategy()->getId());
 
             if ($episodeStrategy === null) {
                 throw new BadRequestHttpException(sprintf("episode strategy <%d> not found", $config->getEpisodeStrategy()->getId()));
             }
 
+            $config->setPosition($key);
             $config->setEpisodeStrategy($episodeStrategy);
-            $this->playlistConfigRepository->save($config);
+            $config->setPosition($key);
+            $config->setEpisodeStrategy($episodeStrategy);
+            $playlist->addPlaylistConfig($config);
         }
         $this->repository->save($playlist, true);
 
         $savedPlaylist = $this->repository->findOneBy(['title' => $playlist->getTitle()]);
 
+        $this->bus->dispatch(new UpdateSinglePlaylistMessage($savedPlaylist->getId()));
+
         return $this->response($savedPlaylist);
+    }
+
+    #[Route('/playlist/{id}/refresh', name: 'api_playlist_refresh', methods: ["POST"])]
+    public function refresh(string $id): Response
+    {
+        $playlist = $this->repository->findOneById($id);
+
+        $handler = $this->handler;
+
+        $handler(new UpdateSinglePlaylistMessage($playlist->getId()));
+
+//        $this->bus->dispatch(new UpdatePlaylistMessage($playlist->getId()));
+
+        return $this->response($playlist);
     }
 
     #[Route('/playlist/{id}', name: 'api_playlist_update', methods: ['PUT'])]
@@ -86,16 +112,16 @@ class PlaylistController extends AbstractController
             $this->playlistConfigRepository->remove($config, true);
         }
 
-        foreach ($playlist->getPlaylistConfigs() as $config) {
-            $episodeStrategy = $this->episodeStrategyRepository->findOneById(["id" => $config->getEpisodeStrategy()->getId()]);
+        foreach ($playlist->getPlaylistConfigs() as $key => $config) {
+            $episodeStrategy = $this->episodeStrategyRepository->findOneById($config->getEpisodeStrategy()->getId());
 
             if ($episodeStrategy === null) {
                 throw new BadRequestHttpException(sprintf("episode strategy <%d> not found", $config->getEpisodeStrategy()->getId()));
             }
 
+            $config->setPosition($key);
             $config->setEpisodeStrategy($episodeStrategy);
-            $config->setPlaylist($dbPlaylist);
-            $this->playlistConfigRepository->save($config);
+            $dbPlaylist->addPlaylistConfig($config);
         }
         $this->repository->save($dbPlaylist, true);
 
@@ -107,7 +133,8 @@ class PlaylistController extends AbstractController
     #[Route('/playlist/{id}', name: 'api_playlist_get', methods: ["GET"])]
     public function get(string $id): Response
     {
-        $playlist = $this->repository->findOneById($id);
+        /** @var Playlist $playlist */
+        $playlist = $this->repository->findOneBy(['id' => $id]);
 
         return $this->response($playlist);
     }

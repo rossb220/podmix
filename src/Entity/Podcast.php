@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\PodcastRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -16,7 +17,7 @@ class Podcast
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    #[Groups(['GET'])]
+    #[Groups(['GET', 'EpisodeStrategy'])]
     private ?string $id = null;
 
     #[ORM\Column(nullable: true)]
@@ -35,6 +36,18 @@ class Podcast
     #[Groups(['GET'])]
     private Collection $episodes;
 
+    #[ORM\Column(length: 255)]
+    #[Groups(['GET'])]
+    private ?string $customTitle = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['GET'])]
+    private ?string $description = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['GET'])]
+    private ?\DateTimeImmutable $pubDate = null;
+
     public function __construct()
     {
         $this->episodes = new ArrayCollection();
@@ -45,9 +58,11 @@ class Podcast
         return $this->id;
     }
 
-    public function setId(): ?string
+    public function setId(string $id): self
     {
-        return $this->id;
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -112,6 +127,42 @@ class Podcast
                 $episode->setPodcast(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCustomTitle(): ?string
+    {
+        return $this->customTitle;
+    }
+
+    public function setCustomTitle(string $customTitle): self
+    {
+        $this->customTitle = $customTitle;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPubDate(): ?\DateTimeImmutable
+    {
+        return $this->pubDate;
+    }
+
+    public function setPubDate(?\DateTimeImmutable $pubDate): self
+    {
+        $this->pubDate = $pubDate;
 
         return $this;
     }

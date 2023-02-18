@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\PlaylistEpisode;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 /**
  * @extends ServiceEntityRepository<PlaylistEpisode>
@@ -37,5 +38,15 @@ class PlaylistEpisodeRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function removeAllByPlaylistId(string $playlistId)
+    {
+        $this->createQueryBuilder('pe')
+            ->delete(PlaylistEpisode::class, 'pe')
+            ->where('pe.playlist = :playlistId')
+            ->setParameter('playlistId', $playlistId, UuidType::NAME)
+            ->getQuery()
+            ->getResult();
     }
 }

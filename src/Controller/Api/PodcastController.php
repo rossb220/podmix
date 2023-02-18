@@ -3,8 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Entity\Podcast;
-use App\Message\PodcastsUpdateMessage;
-use App\Message\PodcastUpdateMessage;
+use App\Message\UpdateAllPodcastsMessage;
+use App\Message\UpdateSinglePodcastMessage;
 use App\Repository\PodcastRepository;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,7 +47,7 @@ class PodcastController extends AbstractController
 
         $this->repository->save($podcast, true);
 
-        $this->bus->dispatch(new PodcastUpdateMessage($podcast->getId()));
+        $this->bus->dispatch(new UpdateSinglePodcastMessage($podcast->getId()));
 
         $savedPodcast = $this->repository->findOneBy(['url' => $podcast->getUrl()]);
 
@@ -74,7 +74,7 @@ class PodcastController extends AbstractController
     {
         $podcast = $this->repository->getOne($id);
 
-        $this->bus->dispatch(new PodcastUpdateMessage($podcast->getId()));
+        $this->bus->dispatch(new UpdateSinglePodcastMessage($podcast->getId()));
 
         return $this->response($podcast);
     }
@@ -82,7 +82,7 @@ class PodcastController extends AbstractController
     #[Route('/podcasts/refresh', name: 'api_podcast_refresh_all', methods: ['POST'])]
     public function refreshAll(): Response
     {
-        $this->bus->dispatch(new PodcastsUpdateMessage());
+        $this->bus->dispatch(new UpdateAllPodcastsMessage());
 
         return new JsonResponse(['message' => 'acknowledged']);
     }

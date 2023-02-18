@@ -37,19 +37,19 @@ class Playlist
     #[ORM\Column(length: 200, nullable: true)]
     private ?string $image = null;
 
-    #[ORM\OneToOne(mappedBy: 'Playlist', cascade: ['persist', 'remove'])]
-    private ?PlaylistEpisode $playlistEpisode = null;
-
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $disabledAt = null;
-
     #[ORM\OneToMany(mappedBy: 'playlist', targetEntity: PlaylistConfig::class, cascade: ['persist', 'remove'])]
     #[Groups(['GET'])]
     private Collection $playlistConfigs;
 
+    #[ORM\OneToMany(mappedBy: 'playlist', targetEntity: PlaylistEpisode::class, orphanRemoval: true)]
+    private Collection $playlistEpisodes;
+
     public function __construct()
     {
         $this->playlistConfigs = new ArrayCollection();
+        $this->playlistEpisodes = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -122,23 +122,6 @@ class Playlist
         return $this;
     }
 
-    public function getPlaylistEpisode(): ?PlaylistEpisode
-    {
-        return $this->playlistEpisode;
-    }
-
-    public function setPlaylistEpisode(PlaylistEpisode $playlistEpisode): self
-    {
-        // set the owning side of the relation if necessary
-        if ($playlistEpisode->getPlaylist() !== $this) {
-            $playlistEpisode->setPlaylist($this);
-        }
-
-        $this->playlistEpisode = $playlistEpisode;
-
-        return $this;
-    }
-
     public function getDisabledAt(): ?\DateTimeImmutable
     {
         return $this->disabledAt;
@@ -159,6 +142,13 @@ class Playlist
         return $this->playlistConfigs;
     }
 
+    public function setPlaylistConfigs(array $playlistsConfigs): self
+    {
+        $this->playlistConfigs = new ArrayCollection($playlistsConfigs);
+
+        return $this;
+    }
+
     public function addPlaylistConfig(PlaylistConfig $playlistConfig): self
     {
         if (!$this->playlistConfigs->contains($playlistConfig)) {
@@ -169,12 +159,30 @@ class Playlist
         return $this;
     }
 
-    public function removePlaylistConfig(PlaylistConfig $playlistConfig): self
+    /**
+     * @return Collection<int, PlaylistEpisode>
+     */
+    public function getPlaylistEpisodes(): Collection
     {
-        if ($this->playlistConfigs->removeElement($playlistConfig)) {
+        return $this->playlistEpisodes;
+    }
+
+    public function addPlaylistEpisode(PlaylistEpisode $playlistEpisode): self
+    {
+        if (!$this->playlistEpisodes->contains($playlistEpisode)) {
+            $this->playlistEpisodes->add($playlistEpisode);
+            $playlistEpisode->setPlaylist($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlaylistEpisode(PlaylistEpisode $playlistEpisode): self
+    {
+        if ($this->playlistEpisodes->removeElement($playlistEpisode)) {
             // set the owning side to null (unless already changed)
-            if ($playlistConfig->getPlaylist() === $this) {
-                $playlistConfig->setPlaylist(null);
+            if ($playlistEpisode->getPlaylist() === $this) {
+                $playlistEpisode->setPlaylist(null);
             }
         }
 
