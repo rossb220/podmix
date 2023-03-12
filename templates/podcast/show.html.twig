@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Podcast{% endblock %}
+
+{% block body %}
+    <h1>Podcast</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ podcast.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ podcast.title }}</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td>{{ podcast.url }}</td>
+            </tr>
+            <tr>
+                <th>DisabledAt</th>
+                <td>{{ podcast.disabledAt ? podcast.disabledAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>CustomTitle</th>
+                <td>{{ podcast.customTitle }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ podcast.description }}</td>
+            </tr>
+            <tr>
+                <th>PubDate</th>
+                <td>{{ podcast.pubDate ? podcast.pubDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_podcast_index') }}">back to list</a>
+
+    <a href="{{ path('app_podcast_edit', {'id': podcast.id}) }}">edit</a>
+
+    {{ include('podcast/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New EpisodeStrategy{% endblock %}
+
+{% block body %}
+    <h1>Create new EpisodeStrategy</h1>
+
+    {{ include('episode_strategy/_form.html.twig') }}
+
+    <a href="{{ path('app_episode_strategy_index') }}">back to list</a>
+{% endblock %}

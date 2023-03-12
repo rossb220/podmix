@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EpisodeStrategy index{% endblock %}
+
+{% block body %}
+    <h1>EpisodeStrategy index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Length</th>
+                <th>Expression</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for episode_strategy in episode_strategies %}
+            <tr>
+                <td>{{ episode_strategy.id }}</td>
+                <td>{{ episode_strategy.title }}</td>
+                <td>{{ episode_strategy.length }}</td>
+                <td>{{ episode_strategy.expression ? episode_strategy.expression|json_encode : '' }}</td>
+                <td>
+                    <a href="{{ path('app_episode_strategy_show', {'id': episode_strategy.id}) }}">show</a>
+                    <a href="{{ path('app_episode_strategy_edit', {'id': episode_strategy.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_episode_strategy_new') }}">Create new</a>
+{% endblock %}

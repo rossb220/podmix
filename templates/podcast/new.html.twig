@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Podcast{% endblock %}
+
+{% block body %}
+    <h1>Create new Podcast</h1>
+
+    {{ include('podcast/_form.html.twig') }}
+
+    <a href="{{ path('app_podcast_index') }}">back to list</a>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Playlist index{% endblock %}
+
+{% block body %}
+    <h1>Playlist index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Link</th>
+                <th>PublishedAt</th>
+                <th>Image</th>
+                <th>DisabledAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for playlist in playlists %}
+            <tr>
+                <td>{{ playlist.id }}</td>
+                <td>{{ playlist.title }}</td>
+                <td>{{ playlist.description }}</td>
+                <td>{{ playlist.link }}</td>
+                <td>{{ playlist.publishedAt ? playlist.publishedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ playlist.image }}</td>
+                <td>{{ playlist.disabledAt ? playlist.disabledAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_playlist_show', {'id': playlist.id}) }}">show</a>
+                    <a href="{{ path('app_playlist_edit', {'id': playlist.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_playlist_new') }}">Create new</a>
+{% endblock %}

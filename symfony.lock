@@ -14,7 +14,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "2.8",
-            "ref": "c38df294eea859b4e2d5f252d4e973f55a264f84"
+            "ref": "6b43b7b6ff6bf2551f2933ebeb66721fa3db8fbc"
         },
         "files": [
             "config/packages/doctrine.yaml",
@@ -36,7 +36,7 @@
         ]
     },
     "phpunit/phpunit": {
-        "version": "9.5",
+        "version": "9.6",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -158,7 +158,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "main",
             "version": "6.0",
-            "ref": "2523f7d31488903e247a522e760dc279be7f7aaf"
+            "ref": "ba1ac4e919baba5644d31b57a3284d6ba12d52ee"
         },
         "files": [
             "config/packages/messenger.yaml"
@@ -291,19 +291,7 @@
             "config/routes/web_profiler.yaml"
         ]
     },
-    "symfony/webapp-pack": {
-        "version": "1.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "1.0",
-            "ref": "2fb3513dbc139884fc5b7c751242b66f9f10f0c3"
-        },
-        "files": [
-            "config/packages/messenger.yaml"
-        ]
-    },
     "twig/extra-bundle": {
-        "version": "v3.5.0"
+        "version": "v3.5.1"
     }
 }

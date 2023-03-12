@@ -94,7 +94,7 @@ class Podcast
         return $this->disabledAt;
     }
 
-    public function setDisabledAt(\DateTimeImmutable $disabledAt): self
+    public function setDisabledAt(?\DateTimeImmutable $disabledAt): self
     {
         $this->disabledAt = $disabledAt;
 
@@ -165,5 +165,10 @@ class Podcast
         $this->pubDate = $pubDate;
 
         return $this;
+    }
+
+    public function __toString() : string
+    {
+        return $this->customTitle;
     }
 }
