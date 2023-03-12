@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\Entity\EpisodeStrategy;
+use App\Entity\Podcast;
 use App\Form\DataTransformer\ExpressionDataTransformer;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -21,9 +23,10 @@ class EpisodeStrategyType extends AbstractType
             ->add('title', TextType::class)
             ->add('length', IntegerType::class)
             ->add('expression', ExpressionType::class)
-            ->add('podcasts');
-
-        
+            ->add('podcasts', EntityType::class, [
+                'class' => Podcast::class,
+                'multiple' => true
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

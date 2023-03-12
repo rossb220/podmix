@@ -12,7 +12,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class PodcastControllerTest extends WebTestCase
 {
-
     public function testCreatePodcast(): Podcast
     {
         $client = static::createClient();

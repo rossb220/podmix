@@ -18,7 +18,7 @@ class PodcastType extends AbstractType
         $builder
             ->add('customTitle')
             ->add('title', TextType::class, ['disabled' => true])
-            ->add('url', UrlType::class,  ['disabled' => true])
+            ->add('url', UrlType::class, ['disabled' => true])
             ->add('description', TextareaType::class, ['disabled' => true])
         ;
     }

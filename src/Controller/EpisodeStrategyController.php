@@ -69,7 +69,7 @@ class EpisodeStrategyController extends AbstractController
     #[Route('/{id}', name: 'app_episode_strategy_delete', methods: ['POST'])]
     public function delete(Request $request, EpisodeStrategy $episodeStrategy, EpisodeStrategyRepository $episodeStrategyRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$episodeStrategy->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $episodeStrategy->getId(), $request->request->get('_token'))) {
             $episodeStrategyRepository->remove($episodeStrategy, true);
         }
 

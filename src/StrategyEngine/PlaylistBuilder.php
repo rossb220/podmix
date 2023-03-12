@@ -57,7 +57,7 @@ class PlaylistBuilder
             }
 
             $expressionableEpisodes = $searchableEpisodes;
-            foreach ($episodeStrategy->getExpression() as $expression) {
+            foreach ($episodeStrategy->getExpression() ?? [] as $expression) {
                 foreach ($expressionHandlers as $expressionHandler) {
                     if ($expressionHandler->getType() === $expression["type"]) {
                         $expressionableEpisodes = $expressionHandler->execute($expression, $expressionableEpisodes);

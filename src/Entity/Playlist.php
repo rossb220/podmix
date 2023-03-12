@@ -3,13 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\EpisodeStrategyRepository;
+use App\Repository\PlaylistRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 
-#[ORM\Entity(repositoryClass: EpisodeStrategyRepository::class)]
+#[ORM\Entity(repositoryClass: PlaylistRepository::class)]
 class Playlist
 {
     #[ORM\Id]

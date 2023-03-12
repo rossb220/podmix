@@ -17,7 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class PodcastController extends AbstractController
 {
     public function __construct(private readonly MessageBusInterface $bus)
-    { }
+    {
+    }
     #[Route('/', name: 'app_podcast_index', methods: ['GET'])]
     public function index(PodcastRepository $podcastRepository): Response
     {
@@ -78,7 +79,7 @@ class PodcastController extends AbstractController
     #[Route('/{id}', name: 'app_podcast_delete', methods: ['POST'])]
     public function delete(Request $request, Podcast $podcast, PodcastRepository $podcastRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$podcast->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $podcast->getId(), $request->request->get('_token'))) {
             $podcastRepository->remove($podcast, true);
         }
 

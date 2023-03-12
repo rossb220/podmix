@@ -12,7 +12,7 @@ final class UpdateAllPlaylistsHandler implements MessageHandlerInterface
 {
     public function __construct(
         readonly UpdateSinglePlaylistMessageHandler $handler,
-        readonly PlaylistRepository                 $playlistRepository,
+        readonly PlaylistRepository $playlistRepository,
     ) {
     }
 

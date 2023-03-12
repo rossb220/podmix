@@ -10,6 +10,7 @@ use App\MessageHandler\UpdateSinglePlaylistMessageHandler;
 use App\Repository\EpisodeStrategyRepository;
 use App\Repository\PlaylistConfigRepository;
 use App\Repository\PlaylistRepository;
+use App\Service\PlaylistConfigTranslator;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -30,7 +31,7 @@ class PlaylistController extends AbstractController
         readonly SerializerInterface $serializer,
         readonly PlaylistRepository $repository,
         readonly PlaylistConfigRepository $playlistConfigRepository,
-        readonly EpisodeStrategyRepository $episodeStrategyRepository,
+        readonly PlaylistConfigTranslator $playlistConfigTranslator,
         readonly MessageBusInterface $bus,
         readonly UpdateSinglePlaylistMessageHandler $handler
     ) {
@@ -53,20 +54,8 @@ class PlaylistController extends AbstractController
         }
 
         $playlist->setPublishedAt(new DateTimeImmutable());
+        $playlist = $this->playlistConfigTranslator->new($playlist);
 
-        foreach ($playlist->getPlaylistConfigs() as $key => $config) {
-            $episodeStrategy = $this->episodeStrategyRepository->findOneById($config->getEpisodeStrategy()->getId());
-
-            if ($episodeStrategy === null) {
-                throw new BadRequestHttpException(sprintf("episode strategy <%d> not found", $config->getEpisodeStrategy()->getId()));
-            }
-
-            $config->setPosition($key);
-            $config->setEpisodeStrategy($episodeStrategy);
-            $config->setPosition($key);
-            $config->setEpisodeStrategy($episodeStrategy);
-            $playlist->addPlaylistConfig($config);
-        }
         $this->repository->save($playlist, true);
 
         $savedPlaylist = $this->repository->findOneBy(['title' => $playlist->getTitle()]);
@@ -108,21 +97,8 @@ class PlaylistController extends AbstractController
             throw new NotFoundHttpException();
         }
 
-        foreach ($dbPlaylist->getPlaylistConfigs() as $config) {
-            $this->playlistConfigRepository->remove($config, true);
-        }
 
-        foreach ($playlist->getPlaylistConfigs() as $key => $config) {
-            $episodeStrategy = $this->episodeStrategyRepository->findOneById($config->getEpisodeStrategy()->getId());
-
-            if ($episodeStrategy === null) {
-                throw new BadRequestHttpException(sprintf("episode strategy <%d> not found", $config->getEpisodeStrategy()->getId()));
-            }
-
-            $config->setPosition($key);
-            $config->setEpisodeStrategy($episodeStrategy);
-            $dbPlaylist->addPlaylistConfig($config);
-        }
+        $dbPlaylist = $this->playlistConfigTranslator->update($dbPlaylist);
         $this->repository->save($dbPlaylist, true);
 
         $savedPlaylist = $this->repository->findOneById($dbPlaylist->getId());

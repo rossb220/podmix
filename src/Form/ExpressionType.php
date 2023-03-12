@@ -18,7 +18,7 @@ class ExpressionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addModelTransformer(new ExpressionDataTransformer);
+        $builder->addModelTransformer(new ExpressionDataTransformer());
     }
 
     public function configureOptions(OptionsResolver $resolver): void

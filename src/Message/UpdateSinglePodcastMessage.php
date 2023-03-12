@@ -5,8 +5,8 @@ namespace App\Message;
 final class UpdateSinglePodcastMessage
 {
     public function __construct(
-        readonly string $podcastId)
-    {
+        readonly string $podcastId
+    ) {
     }
 
     public function getPodcastId(): string
